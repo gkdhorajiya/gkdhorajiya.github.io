@@ -442,36 +442,36 @@
 			</div>
 			<div class="choose animate-box">
 				<h2>Contact</h2>
-				<form action="#">
+				<form method="post" name="contact_form">
 					<div class="row form-group">
 						<div class="col-md-6">
-							<input type="text" id="fname" class="form-control" placeholder="Your firstname">
+							<input type="text" id="fname" name="fname" class="form-control" placeholder="Your firstname">
 						</div>
 						<div class="col-md-6">
-							<input type="text" id="lname" class="form-control" placeholder="Your lastname">
+							<input type="text" id="lname" name="lname" class="form-control" placeholder="Your lastname">
 						</div>
 					</div>
 					<div class="row form-group">
 						<div class="col-md-12">
-							<input type="text" id="email" class="form-control" placeholder="Your email address">
-						</div>
-					</div>
-
-					<div class="row form-group">
-						<div class="col-md-12">
-							<input type="text" id="mobile" class="form-control" placeholder="Your Mobile with country code">
+							<input type="text" id="email" name="email" class="form-control" placeholder="Your email address">
 						</div>
 					</div>
 
 					<div class="row form-group">
 						<div class="col-md-12">
-							<input type="text" id="subject" class="form-control" placeholder="Your subject of this message">
+							<input type="text" id="mobile" name="mobile" class="form-control" placeholder="Your Mobile with country code">
 						</div>
 					</div>
 
 					<div class="row form-group">
 						<div class="col-md-12">
-							<textarea name="message" id="message" cols="30" rows="10" class="form-control" placeholder="Say something about us"></textarea>
+							<input type="text" id="subject" name="subject" class="form-control" placeholder="Your subject of this message">
+						</div>
+					</div>
+
+					<div class="row form-group">
+						<div class="col-md-12">
+							<textarea name="message" id="message" name="message" cols="30" rows="10" class="form-control" placeholder="Say something about us"></textarea>
 						</div>
 					</div>
 
@@ -500,7 +500,7 @@
 						</script>
 					</div>
 					<div class="form-group">
-						<input type="submit" value="Send Message" class="btn btn-primary">
+						<input type="submit" name="submit" value="Send Message" class="btn btn-primary">
 					</div>
 
 				</form>	
@@ -535,6 +535,10 @@
 		<script src="js/jquery.easypiechart.min.js"></script>
 		<!-- Main -->
 		<script src="js/main.js"></script>
+
+		<script type="text/javascript">
+			
+		</script>
 	</body>
 </html>
 
