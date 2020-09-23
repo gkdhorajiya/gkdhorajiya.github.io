@@ -436,76 +436,7 @@
 			</div>
 		</div>
 
-		<div id="fh5co-consult">
-			<div class="video fh5co-video" style="background-image: url(images/cover_bg_1.jpg);">
-				<div class="overlay"></div>
-			</div>
-			<div class="choose animate-box">
-				<h2>Contact</h2>
-				<form method="post" name="contact_form">
-					<div class="row form-group">
-						<div class="col-md-6">
-							<input type="text" id="fname" name="fname" class="form-control" placeholder="Your firstname">
-						</div>
-						<div class="col-md-6">
-							<input type="text" id="lname" name="lname" class="form-control" placeholder="Your lastname">
-						</div>
-					</div>
-					<div class="row form-group">
-						<div class="col-md-12">
-							<input type="text" id="email" name="email" class="form-control" placeholder="Your email address">
-						</div>
-					</div>
 
-					<div class="row form-group">
-						<div class="col-md-12">
-							<input type="text" id="mobile" name="mobile" class="form-control" placeholder="Your Mobile with country code">
-						</div>
-					</div>
-
-					<div class="row form-group">
-						<div class="col-md-12">
-							<input type="text" id="subject" name="subject" class="form-control" placeholder="Your subject of this message">
-						</div>
-					</div>
-
-					<div class="row form-group">
-						<div class="col-md-12">
-							<textarea name="message" id="message" name="message" cols="30" rows="10" class="form-control" placeholder="Say something about us"></textarea>
-						</div>
-					</div>
-
-					<div class="row form-group">
-						<div class="col-md-12">
-							<input type="date" name="txtDate" id="txtDate" class="form-control" >
-						</div>
-						<script type="text/javascript">
-							var fulldate = new Date();
-							var datestr = fulldate.toISOString();
-							var today = datestr.split('T')[0];
-							var year = fulldate.getFullYear()+1;
-							var month = fulldate.getMonth()+1;
-							if(day<10){
-						        day='0'+day;
-						    } 
-						    if(month<10){
-						        month='0'+month
-						    } 
-							var day = fulldate.getDate();
-							var lastDate = year+'-'+month+'-'+day;
-							console.log(today);
-							console.log(lastDate);
-							document.getElementsByName("txtDate")[0].setAttribute('min', today);
-							document.getElementsByName("txtDate")[0].setAttribute('max', lastDate);
-						</script>
-					</div>
-					<div class="form-group">
-						<input type="submit" name="submit" value="Send Message" class="btn btn-primary">
-					</div>
-
-				</form>	
-			</div>
-		</div>
 
 		<div id="fh5co-footer">
 			<div class="container">
