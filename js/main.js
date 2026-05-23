@@ -1,149 +1,166 @@
 ;(function () {
-	
-	'use strict';
+  'use strict';
 
-	var isMobile = {
-		Android: function() {
-			return navigator.userAgent.match(/Android/i);
-		},
-			BlackBerry: function() {
-			return navigator.userAgent.match(/BlackBerry/i);
-		},
-			iOS: function() {
-			return navigator.userAgent.match(/iPhone|iPad|iPod/i);
-		},
-			Opera: function() {
-			return navigator.userAgent.match(/Opera Mini/i);
-		},
-			Windows: function() {
-			return navigator.userAgent.match(/IEMobile/i);
-		},
-			any: function() {
-			return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
-		}
-	};
+  var getTheme = function () {
+    return localStorage.getItem('theme') || 'dark';
+  };
 
-	
-	var fullHeight = function() {
+  var setTheme = function (theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+    var icon = document.getElementById('themeIcon');
+    if (icon) {
+      icon.className = theme === 'dark' ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+    }
+  };
 
-		if ( !isMobile.any() ) {
-			$('.js-fullheight').css('height', $(window).height());
-			$(window).resize(function(){
-				$('.js-fullheight').css('height', $(window).height());
-			});
-		}
-	};
+  var toggleTheme = function () {
+    var current = getTheme();
+    setTheme(current === 'dark' ? 'light' : 'dark');
+    setTimeout(function () { redrawCharts(); }, 100);
+  };
 
-	// Parallax
-	var parallax = function() {
-		$(window).stellar();
-	};
+  var handleThemeToggle = function () {
+    var btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    btn.addEventListener('click', toggleTheme);
+  };
 
-	var contentWayPoint = function() {
-		var i = 0;
-		$('.animate-box').waypoint( function( direction ) {
+  var loader = function () {
+    var el = document.querySelector('.gk-loader');
+    if (!el) return;
+    el.style.opacity = '0';
+    setTimeout(function () { el.style.display = 'none'; }, 400);
+  };
 
-			if( direction === 'down' && !$(this.element).hasClass('animated-fast') ) {
-				
-				i++;
+  var backToTop = function () {
+    var btn = document.querySelector('.gk-back-top');
+    var link = document.querySelector('.js-gotop');
+    if (!btn || !link) return;
+    link.addEventListener('click', function (e) {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    window.addEventListener('scroll', function () {
+      btn.classList.toggle('active', window.scrollY > 200);
+    });
+  };
 
-				$(this.element).addClass('item-animate');
-				setTimeout(function(){
+  var scrollReveal = function () {
+    var els = document.querySelectorAll(
+      '.gk-section, .gk-project-card, .gk-skill-box, .gk-progress-item, .gk-about-card, .gk-timeline-item, .gk-skill-category'
+    );
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('gk-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+    els.forEach(function (el) { observer.observe(el); });
+  };
 
-					$('body .animate-box.item-animate').each(function(k){
-						var el = $(this);
-						setTimeout( function () {
-							var effect = el.data('animate-effect');
-							if ( effect === 'fadeIn') {
-								el.addClass('fadeIn animated-fast');
-							} else if ( effect === 'fadeInLeft') {
-								el.addClass('fadeInLeft animated-fast');
-							} else if ( effect === 'fadeInRight') {
-								el.addClass('fadeInRight animated-fast');
-							} else {
-								el.addClass('fadeInUp animated-fast');
-							}
+  var storedCanvases = [];
 
-							el.removeClass('item-animate');
-						},  k * 100, 'easeInOutExpo' );
-					});
-					
-				}, 50);
-				
-			}
+  var drawChart = function (canvas, percent, theme) {
+    var ctx = canvas.getContext('2d');
+    var w = canvas.width;
+    var h = canvas.height;
+    var cx = w / 2;
+    var cy = h / 2;
+    var r = Math.min(cx, cy) - 5;
+    var isLight = theme === 'light';
 
-		} , { offset: '85%' } );
-	};
+    ctx.clearRect(0, 0, w, h);
 
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.strokeStyle = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)';
+    ctx.lineWidth = 3;
+    ctx.stroke();
 
+    var startAngle = -Math.PI / 2;
+    var endAngle = startAngle + (Math.PI * 2 * percent / 100);
+    var grad = ctx.createLinearGradient(0, 0, w, h);
+    grad.addColorStop(0, '#a855f7');
+    grad.addColorStop(1, '#22d3ee');
 
-	var goToTop = function() {
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, startAngle, endAngle);
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+  };
 
-		$('.js-gotop').on('click', function(event){
-			
-			event.preventDefault();
+  var initCharts = function () {
+    var items = document.querySelectorAll('.gk-skill-box');
+    items.forEach(function (item) {
+      var pct = parseInt(item.getAttribute('data-percent'), 10) || 0;
+      var iconClass = item.getAttribute('data-icon') || '';
 
-			$('html, body').animate({
-				scrollTop: $('html').offset().top
-			}, 500, 'easeInOutExpo');
-			
-			return false;
-		});
+      var iconEl = document.createElement('i');
+      iconEl.className = iconClass + ' skill-icon';
 
-		$(window).scroll(function(){
+      var canvas = document.createElement('canvas');
+      canvas.width = 70;
+      canvas.height = 70;
+      canvas.style.cssText = 'display:block;margin:0 auto 0.25rem;';
 
-			var $win = $(window);
-			if ($win.scrollTop() > 200) {
-				$('.js-top').addClass('active');
-			} else {
-				$('.js-top').removeClass('active');
-			}
+      var nameEl = item.querySelector('.skill-name');
+      if (nameEl) {
+        item.insertBefore(canvas, nameEl);
+        item.insertBefore(iconEl, nameEl);
+      } else {
+        item.appendChild(canvas);
+        item.appendChild(iconEl);
+      }
 
-		});
-	
-	};
+      storedCanvases.push({ canvas: canvas, percent: pct });
 
-	var pieChart = function() {
-		$('.chart').easyPieChart({
-			scaleColor: false,
-			lineWidth: 4,
-			lineCap: 'butt',
-			barColor: '#FF9000',
-			trackColor:	"#f5f5f5",
-			size: 160,
-			animate: 1000
-		});
-	};
+      var observer = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            setTimeout(function () { drawChart(canvas, pct, getTheme()); }, 200);
+            observer.unobserve(item);
+          }
+        });
+      }, { threshold: 0.3 });
+      observer.observe(item);
+    });
+  };
 
-	var skillsWayPoint = function() {
-		if ($('#fh5co-skills').length > 0 ) {
-			$('#fh5co-skills').waypoint( function( direction ) {
-										
-				if( direction === 'down' && !$(this.element).hasClass('animated') ) {
-					setTimeout( pieChart , 400);					
-					$(this.element).addClass('animated');
-				}
-			} , { offset: '90%' } );
-		}
+  var redrawCharts = function () {
+    var theme = getTheme();
+    storedCanvases.forEach(function (item) {
+      drawChart(item.canvas, item.percent, theme);
+    });
+  };
 
-	};
+  var animateProgressBars = function () {
+    var bars = document.querySelectorAll('.gk-progress-bar');
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          var bar = entry.target;
+          var w = bar.getAttribute('data-width') || 0;
+          setTimeout(function () { bar.style.width = w + '%'; }, 300);
+          observer.unobserve(bar);
+        }
+      });
+    }, { threshold: 0.3 });
+    bars.forEach(function (bar) { observer.observe(bar); });
+  };
 
+  setTheme(getTheme());
 
-	// Loading page
-	var loaderPage = function() {
-		$(".fh5co-loader").fadeOut("slow");
-	};
-
-	
-	$(function(){
-		contentWayPoint();
-		goToTop();
-		loaderPage();
-		fullHeight();
-		parallax();
-		// pieChart();
-		skillsWayPoint();
-	});
-
-
-}());
+  document.addEventListener('DOMContentLoaded', function () {
+    loader();
+    handleThemeToggle();
+    backToTop();
+    scrollReveal();
+    initCharts();
+    animateProgressBars();
+  });
+})();
